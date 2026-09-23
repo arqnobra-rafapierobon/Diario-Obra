@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Diário de Obra</title>
+<meta name="theme-color" content="#1C2A3B">
+<meta name="description" content="Diário de obra (RDO) com histórico diário, fotos, locações e projetos.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Diário de Obra">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{
+  --bg:#EEF0F2; --surface:#FFFFFF; --surface-2:#E4E7EB; --ink:#151B24; --ink-2:#4F5968; --line:#D3D8DF;
+  --head:#1C2A3B; --head-ink:#F2F4F7; --head-ink-2:#A9B6C6;
+  --accent:#D45F14; --accent-ink:#FFFFFF; --accent-soft:#FBE6D6;
+  --ok:#2C7A4B; --ok-soft:#DDF0E4; --warn:#9A6200; --warn-soft:#FBEFCF; --crit:#B8322A; --crit-soft:#F8DEDB;
+  --radius:10px;
+  --f-disp:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0E1218; --surface:#161C25; --surface-2:#202834; --ink:#E7EBF1; --ink-2:#9BA6B6; --line:#2B3442;
+    --head:#0A0E14; --head-ink:#E7EBF1; --head-ink-2:#8795A8;
+    --accent:#F0853A; --accent-ink:#1A0F06; --accent-soft:#3A2415;
+    --ok:#5BC286; --ok-soft:#15301F; --warn:#E3B04B; --warn-soft:#352A12; --crit:#F07469; --crit-soft:#3A1917;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1218; --surface:#161C25; --surface-2:#202834; --ink:#E7EBF1; --ink-2:#9BA6B6; --line:#2B3442;
+  --head:#0A0E14; --head-ink:#E7EBF1; --head-ink-2:#8795A8;
+  --accent:#F0853A; --accent-ink:#1A0F06; --accent-soft:#3A2415;
+  --ok:#5BC286; --ok-soft:#15301F; --warn:#E3B04B; --warn-soft:#352A12; --crit:#F07469; --crit-soft:#3A1917;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45}
+button,input,select,textarea{font:inherit;color:inherit}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--head);color:var(--head-ink)}
+.top-in{max-width:760px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px;min-height:56px}
+.brand{font-family:var(--f-disp);font-weight:700;font-size:20px;letter-spacing:.06em;text-transform:uppercase;line-height:1.05;flex:1;min-width:0}
+.brand small{display:block;font-family:var(--f-body);font-weight:500;font-size:12px;letter-spacing:.02em;text-transform:none;color:var(--head-ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.back{background:none;border:1px solid var(--head-ink-2);color:var(--head-ink);border-radius:8px;height:36px;padding:0 12px;font-weight:600;cursor:pointer}
+.wrap{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:16px 96px;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{font-family:var(--f-disp);font-weight:700;margin:0;text-wrap:balance;letter-spacing:.01em}
+h1{font-size:30px;line-height:1.05}
+h2{font-size:22px}
+h3{font-size:17px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-2)}
+.muted{color:var(--ink-2)}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.spread{justify-content:space-between}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);min-height:44px;padding:0 16px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.danger{color:var(--crit);border-color:var(--crit)}
+.btn.small{min-height:36px;padding:0 12px;font-size:14px}
+.btn.block{width:100%}
+.btn:disabled{opacity:.5;cursor:default}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+.list{display:flex;flex-direction:column;gap:10px}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;display:flex;gap:12px;align-items:flex-start;cursor:pointer;text-align:left;width:100%}
+.item:hover{border-color:var(--ink-2)}
+.item .grow{flex:1;min-width:0}
+.item .t{font-weight:600;font-size:17px}
+.item .s{color:var(--ink-2);font-size:14px}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--ink-2);white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.warn{background:var(--warn-soft);color:var(--warn)} .pill.crit{background:var(--crit-soft);color:var(--crit)} .pill.acc{background:var(--accent-soft);color:var(--accent)}
+.datebox{flex:none;width:56px;text-align:center;border-right:1px solid var(--line);padding-right:10px}
+.datebox b{display:block;font-family:var(--f-disp);font-size:28px;line-height:1}
+.datebox span{font-size:12px;color:var(--ink-2);text-transform:uppercase;letter-spacing:.06em}
+.tabs{display:flex;gap:4px;background:var(--surface-2);padding:4px;border-radius:12px;overflow-x:auto}
+.tab{flex:1;border:0;background:none;border-radius:9px;min-height:40px;padding:0 10px;font-weight:600;color:var(--ink-2);cursor:pointer;white-space:nowrap}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.alert{border-radius:var(--radius);padding:10px 14px;font-size:14px;font-weight:500}
+.alert.warn{background:var(--warn-soft);color:var(--warn)} .alert.crit{background:var(--crit-soft);color:var(--crit)} .alert.info{background:var(--surface-2);color:var(--ink-2)}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--ink-2);text-transform:uppercase;letter-spacing:.05em}
+label.f input,label.f select,label.f textarea,.inp{font-size:16px;text-transform:none;letter-spacing:0;font-weight:400;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;min-height:44px;padding:8px 12px;width:100%}
+textarea{min-height:96px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:520px){.grid2{grid-template-columns:1fr}}
+.form{display:flex;flex-direction:column;gap:14px}
+.sec{display:flex;flex-direction:column;gap:10px}
+.clima{display:grid;grid-template-columns:72px 1fr;gap:8px 10px;align-items:center}
+.clima .p{font-weight:600;font-size:14px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{border:1px solid var(--line);background:var(--surface);border-radius:8px;min-height:38px;padding:0 10px;font-size:14px;font-weight:500;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--head);color:var(--head-ink);border-color:var(--head)}
+.efrow{display:grid;grid-template-columns:1fr 84px 40px;gap:8px}
+.x{border:1px solid var(--line);background:var(--surface);border-radius:8px;cursor:pointer;font-size:18px;color:var(--ink-2)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px dashed var(--ink-2);background:none;border-radius:999px;padding:4px 10px;font-size:13px;cursor:pointer;color:var(--ink-2)}
+.fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.foto .leg{padding:8px 10px 0;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-2)}
+.foto .legaviso{margin:0 10px 8px;align-self:flex-start;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--warn-soft);color:var(--warn)}
+.foto{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column}
+.foto img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:var(--surface-2)}
+.foto textarea{border:1px solid var(--line);border-radius:8px;margin:6px 10px 8px;width:calc(100% - 20px);min-height:84px;font-size:15px;padding:8px;background:var(--surface);color:var(--ink)}
+.foto .rm{border:0;border-top:1px solid var(--line);background:none;color:var(--crit);min-height:36px;font-size:13px;font-weight:600;cursor:pointer}
+.upl{border:2px dashed var(--line);border-radius:var(--radius);padding:16px;text-align:center;color:var(--ink-2);cursor:pointer;display:block}
+.upl input{display:none}
+/* relatório */
+.rep{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.rep-h{background:var(--head);color:var(--head-ink);padding:14px 16px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.rep-h .lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--head-ink-2)}
+.rep-h .v{font-family:var(--f-disp);font-size:22px;font-weight:700}
+.rep-b{padding:4px 16px 16px}
+.rep-s{padding-block:14px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.rep-s:last-child{border-bottom:0}
+.tbl-w{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-2);font-weight:600}
+td.n{text-align:right;font-family:var(--f-mono)}
+.txt{white-space:pre-wrap}
+.rep-fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.rep-fotos figure{margin:0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.rep-fotos img{width:100%;display:block;background:var(--surface-2)}
+.rep-fotos figcaption{padding:8px 10px;font-size:14px;white-space:pre-wrap}
+.rep-fotos figcaption b{font-family:var(--f-mono);font-size:12px;color:var(--ink-2);margin-right:6px}
+.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:9;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.empty{text-align:center;padding:28px 16px;color:var(--ink-2);border:1px dashed var(--line);border-radius:var(--radius)}
+.modal{position:fixed;inset:0;background:rgba(8,12,18,.55);display:flex;align-items:flex-end;justify-content:center;z-index:50;padding:16px}
+.modal .card{max-width:440px;width:100%;display:flex;flex-direction:column;gap:14px;margin-bottom:env(safe-area-inset-bottom,0px)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--head);color:var(--head-ink);padding:10px 16px;border-radius:10px;z-index:60;font-weight:500;max-width:calc(100% - 32px)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:15px}
+.kv dt{color:var(--ink-2)} .kv dd{margin:0;font-weight:500}
+.stripe{width:4px;align-self:stretch;border-radius:4px;background:var(--surface-2);flex:none}
+.stripe.ok{background:var(--ok)} .stripe.warn{background:var(--warn)} .stripe.crit{background:var(--crit)}
+@media (prefers-reduced-motion:no-preference){.item,.btn{transition:border-color .15s,background .15s}}
+
+html,body{margin:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+.top{padding-top:env(safe-area-inset-top,0px);top:0}
+.wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+@media print{
+  :root{color-scheme:light;--bg:#fff;--surface:#fff;--surface-2:#eee;--ink:#000;--ink-2:#444;--line:#bbb;--head:#1C2A3B;--head-ink:#fff;--head-ink-2:#cfd6df}
+  .top,.noprint,#toast,#modal{display:none!important}
+  body{background:#fff}
+  .wrap{padding:0;max-width:none}
+  .rep{border:0}
+  .rep-h{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .rep-fotos{grid-template-columns:1fr 1fr}
+  .rep-fotos figure{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in" id="top"></div></header>
+<main class="wrap" id="app"><div class="empty">Carregando…</div></main>
+<div id="modal"></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+(function(){
+/* ---------- armazenamento no aparelho (IndexedDB) ---------- */
+const STORES=['obras','rdos','locacoes','projetos','arquivos'];
+const DB={
+  db:null,
+  open(){return new Promise((res,rej)=>{
+    if(!('indexedDB' in window))return rej(new Error('sem IndexedDB'));
+    const r=indexedDB.open('diario-obra',1);
+    r.onupgradeneeded=()=>{const d=r.result;STORES.forEach(n=>{if(!d.objectStoreNames.contains(n))d.createObjectStore(n,{keyPath:'id'})})};
+    r.onsuccess=()=>{this.db=r.result;res()};r.onerror=()=>rej(r.error);
+  })},
+  tx(n,mode,fn){return new Promise((res,rej)=>{const t=this.db.transaction(n,mode);const q=fn(t.objectStore(n));let out;if(q)q.onsuccess=()=>{out=q.result};t.oncomplete=()=>res(out);t.onerror=()=>rej(t.error);t.onabort=()=>rej(t.error)})},
+  all(n){return this.tx(n,'readonly',s=>s.getAll())},
+  get(n,id){return this.tx(n,'readonly',s=>s.get(id))},
+  put(n,v){return this.tx(n,'readwrite',s=>s.put(v))},
+  del(n,id){return this.tx(n,'readwrite',s=>s.delete(id))},
+};
+let pediuPersist=false;
+function persistir(){if(pediuPersist)return;pediuPersist=true;try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}}
+
+const S={obras:[],allRdos:[],allLocs:[],allProjs:[],view:{name:'home'},obra:null,rdos:[],locs:[],projs:[],draft:null,loc:null,proj:null,busy:false,ready:false,erro:null};
+const urls={};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const hoje=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
+const fmt=iso=>iso?iso.split('-').reverse().join('/'):'—';
+const DS=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+const MES=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const dia=iso=>new Date(iso+'T12:00:00');
+const diff=(a,b)=>Math.round((dia(b)-dia(a))/86400000);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const STATUS={andamento:['Em andamento','ok'],paralisada:['Paralisada','warn'],concluida:['Concluída','']};
+const TEMPO=['Bom','Nublado','Chuva','Sem expediente'];
+const COND=['Praticável','Impraticável'];
+const FUNCOES=['Mestre de obras','Pedreiro','Servente','Carpinteiro','Armador','Eletricista','Encanador','Pintor'];
+const DISC=['Arquitetônico','Estrutural','Fundações','Elétrico','Hidrossanitário','Incêndio','Outros'];
+const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+
+function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,2800)}
+function confirmar(msg,btn,fn){S.confirm={msg,btn,fn};renderModal()}
+function renderModal(){
+  const m=$('#modal');
+  if(!S.confirm){m.innerHTML='';return}
+  m.innerHTML=`<div class="modal"><div class="card" role="dialog" aria-modal="true"><p style="margin:0">${esc(S.confirm.msg)}</p><div class="row" style="justify-content:flex-end"><button class="btn" data-act="cf-no">Cancelar</button><button class="btn primary" data-act="cf-yes">${esc(S.confirm.btn)}</button></div></div></div>`;
+}
+function locStatus(l){
+  if(l.devolvido) return {k:'',txt:'Devolvido'};
+  if(!l.vencimento) return {k:'',txt:'Sem vencimento'};
+  const d=diff(hoje(),l.vencimento);
+  if(d<0) return {k:'crit',txt:`Vencida há ${-d} dia${d===-1?'':'s'}`};
+  if(d===0) return {k:'crit',txt:'Vence hoje'};
+  if(d<=3) return {k:'warn',txt:`Vence em ${d} dia${d===1?'':'s'}`};
+  return {k:'ok',txt:`Vence em ${fmt(l.vencimento)}`};
+}
+function alertas(obraId){let c=0,w=0;S.allLocs.forEach(l=>{if(l.obraId!==obraId)return;const s=locStatus(l);if(s.k==='crit')c++;else if(s.k==='warn')w++});return {c,w}}
+
+/* ---------- imagens / arquivos ---------- */
+async function urlDe(id){
+  if(urls[id])return urls[id];
+  const a=await DB.get('arquivos',id);if(!a)return null;
+  urls[id]=URL.createObjectURL(a.blob);return urls[id];
+}
+function hidratar(){document.querySelectorAll('img[data-img]').forEach(async img=>{if(img.src)return;const u=await urlDe(img.dataset.img);if(u)img.src=u;else img.alt='Foto não encontrada'})}
+function soltarUrl(id){if(urls[id]){URL.revokeObjectURL(urls[id]);delete urls[id]}}
+async function apagarArquivo(id){soltarUrl(id);try{await DB.del('arquivos',id)}catch(e){}}
+
+/* ---------- dados derivados ---------- */
+function derivar(){
+  if(!S.obra)return;const id=S.obra.id;
+  S.obra=S.obras.find(o=>o.id===id)||S.obra;
+  S.rdos=S.allRdos.filter(r=>r.obraId===id).sort((a,b)=>b.data.localeCompare(a.data));
+  S.locs=S.allLocs.filter(l=>l.obraId===id);
+  S.projs=S.allProjs.filter(p=>p.obraId===id);
+}
+function troca(arr,rec){const i=arr.findIndex(x=>x.id===rec.id);if(i>=0)arr[i]=rec;else arr.push(rec)}
+function tira(arr,id){const i=arr.findIndex(x=>x.id===id);if(i>=0)arr.splice(i,1)}
+function abrirObra(id,tab){
+  S.obra=S.obras.find(o=>o.id===id)||null;if(!S.obra){S.view={name:'home'};render();return}
+  S.view={name:'obra',id,tab:tab||'diario'};S.loc=null;S.proj=null;
+  LS.set('ultimaObra',id);render();
+}
+
+/* ---------- topo ---------- */
+function renderTop(){
+  const v=S.view;let back='',title='Diário de Obra',sub='';
+  if(v.name==='obra'){back='home';title=S.obra?.nome||'Obra';sub=S.obra?.endereco||''}
+  if(v.name==='obraForm'){back=v.id?'obra':'home';title=v.id?'Editar obra':'Nova obra'}
+  if(v.name==='rdo'||v.name==='rdoEdit'){back='obra';title=v.name==='rdo'?'Relatório diário':'Preencher RDO';sub=S.obra?.nome||''}
+  if(v.name==='backup'){back='home';title='Backup e dados'}
+  $('#top').innerHTML=`${back?`<button class="back" data-act="back" data-to="${back}" aria-label="Voltar">‹ Voltar</button>`:''}<div class="brand">${esc(title)}${sub?`<small>${esc(sub)}</small>`:''}</div>${v.name==='home'?`<button class="back" data-act="backup">Backup</button>`:''}`;
+}
+
+/* ---------- telas ---------- */
+function vHome(){
+  const ordem={andamento:0,paralisada:1,concluida:2};
+  const obras=[...S.obras].sort((a,b)=>(ordem[a.status]??0)-(ordem[b.status]??0)||(b.ultimoRdo||'').localeCompare(a.ultimoRdo||''));
+  const d=new Date();
+  let h=`<div class="row spread"><div><h1>Minhas obras</h1><div class="muted">${DS[d.getDay()]}, ${d.getDate()} de ${MES[d.getMonth()]} de ${d.getFullYear()}</div></div><button class="btn primary" data-act="novaObra">+ Nova obra</button></div>`;
+  if(!obras.length) h+=`<div class="empty">Nenhuma obra cadastrada ainda.<br>Toque em <b>+ Nova obra</b> para começar o diário.<br><br><span style="font-size:14px">Os dados ficam guardados neste aparelho. Faça backup de vez em quando em <b>Backup</b>.</span></div>`;
+  h+=`<div class="list">`+obras.map(o=>{
+    const st=STATUS[o.status]||STATUS.andamento;const a=alertas(o.id);
+    const dias=o.inicio?diff(o.inicio,hoje())+1:null;
+    const rdoHoje=o.ultimoRdo===hoje();
+    return `<button class="item" data-act="abrir" data-id="${esc(o.id)}"><span class="stripe ${a.c?'crit':a.w?'warn':''}"></span><span class="grow">
+      <span class="t">${esc(o.nome)}</span>
+      <span class="s" style="display:block">${esc(o.endereco||o.cliente||'')}</span>
+      <span class="row" style="gap:6px;margin-top:6px"><span class="pill ${st[1]}">${st[0]}</span>
+      ${dias!==null&&dias>0?`<span class="pill mono">Dia ${dias}</span>`:''}
+      ${rdoHoje?'<span class="pill ok">RDO de hoje feito</span>':o.status!=='concluida'?`<span class="pill">Último RDO: ${o.ultimoRdo?fmt(o.ultimoRdo):'nenhum'}</span>`:''}
+      ${a.c?`<span class="pill crit">${a.c} locação vencida</span>`:''}${a.w?`<span class="pill warn">${a.w} vencendo</span>`:''}</span>
+    </span><span class="muted" aria-hidden="true">›</span></button>`}).join('')+`</div>`;
+  return h;
+}
+
+function vObraForm(){
+  const o=S.view.id?(S.obras.find(x=>x.id===S.view.id)||{}):{inicio:hoje(),status:'andamento'};
+  return `<form class="form card" id="fObra">
+    <label class="f">Nome da obra<input id="o_nome" required value="${esc(o.nome)}" placeholder="Ex.: Residência Silva"></label>
+    <label class="f">Cliente<input id="o_cliente" value="${esc(o.cliente)}"></label>
+    <label class="f">Endereço<input id="o_end" value="${esc(o.endereco)}"></label>
+    <label class="f">Responsável técnico<input id="o_resp" value="${esc(o.responsavel)}"></label>
+    <div class="grid2"><label class="f">Início<input type="date" id="o_ini" value="${esc(o.inicio)}"></label>
+    <label class="f">Previsão de término<input type="date" id="o_fim" value="${esc(o.previsao)}"></label></div>
+    <label class="f">Situação<select id="o_status">${Object.entries(STATUS).map(([k,v])=>`<option value="${k}" ${o.status===k?'selected':''}>${v[0]}</option>`).join('')}</select></label>
+    <button class="btn primary block" type="submit">${S.view.id?'Salvar alterações':'Criar obra'}</button>
+  </form>`;
+}
+
+function vObra(){
+  const o=S.obra||{};const t=S.view.tab;
+  const tabs=[['diario','Diário'],['locacoes','Locações'],['projetos','Projetos'],['dados','Dados']];
+  let h=`<div class="tabs" role="tablist">${tabs.map(([k,l])=>`<button class="tab" role="tab" aria-selected="${t===k}" data-act="tab" data-tab="${k}">${l}${k==='locacoes'&&S.locs.length?` <span class="mono">(${S.locs.filter(x=>!x.devolvido).length})</span>`:''}</button>`).join('')}</div>`;
+  if(t==='diario')h+=tDiario(o);
+  if(t==='locacoes')h+=tLocacoes();
+  if(t==='projetos')h+=tProjetos();
+  if(t==='dados')h+=tDados(o);
+  return h;
+}
+
+function tDiario(o){
+  const hj=hoje();const feito=S.rdos.find(r=>r.data===hj);
+  const venc=S.locs.map(l=>({l,s:locStatus(l)})).filter(x=>x.s.k==='crit'||x.s.k==='warn');
+  let h='';
+  if(venc.length)h+=`<button class="alert ${venc.some(x=>x.s.k==='crit')?'crit':'warn'}" style="border:0;text-align:left;cursor:pointer" data-act="tab" data-tab="locacoes">⚠ ${venc.map(x=>`${esc(x.l.equipamento)} — ${x.s.txt.toLowerCase()}`).join(' · ')}</button>`;
+  h+=`<div class="card row spread"><div><div class="muted" style="font-size:13px">HOJE · ${fmt(hj)}${o.inicio?` · <span class="mono">DIA ${diff(o.inicio,hj)+1}</span>`:''}</div><div style="font-weight:600">${feito?'RDO de hoje já iniciado':'RDO de hoje ainda não preenchido'}</div></div>
+  <button class="btn primary" data-act="rdoNovo">${feito?'Continuar RDO':'Preencher RDO de hoje'}</button></div>`;
+  h+=`<div class="row spread"><h2>Histórico</h2><span class="muted mono">${S.rdos.length} relatório${S.rdos.length===1?'':'s'}</span></div>`;
+  if(!S.rdos.length) h+=`<div class="empty">Os relatórios diários desta obra vão aparecer aqui, do mais recente ao mais antigo.</div>`;
+  h+=`<div class="list">`+S.rdos.map(r=>{
+    const d=dia(r.data);const ef=(r.efetivo||[]).reduce((s,e)=>s+(+e.qtd||0),0);
+    const cl=r.clima||{};const imp=['manha','tarde','noite'].some(p=>cl[p]?.cond==='Impraticável');
+    return `<button class="item" data-act="rdoVer" data-id="${esc(r.id)}"><span class="datebox"><b>${d.getDate()}</b><span>${MES[d.getMonth()]}</span></span><span class="grow">
+      <span class="t" style="font-size:16px">${DS[d.getDay()]}${o.inicio?` · <span class="mono muted" style="font-size:14px">Dia ${diff(o.inicio,r.data)+1}</span>`:''}</span>
+      <span class="s" style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc((r.servicos||'Sem serviços registrados').split('\n')[0])}</span>
+      <span class="row" style="gap:6px;margin-top:6px"><span class="pill">Manhã: ${esc(cl.manha?.tempo||'—')}</span><span class="pill">Tarde: ${esc(cl.tarde?.tempo||'—')}</span><span class="pill">Noite: ${esc(cl.noite?.tempo||'—')}</span>
+      ${imp?'<span class="pill warn">Impraticável</span>':''}<span class="pill mono">${ef} pessoas</span>${(r.fotos||[]).length?`<span class="pill mono">${r.fotos.length} foto${r.fotos.length>1?'s':''}</span>`:''}</span>
+    </span></button>`}).join('')+`</div>`;
+  return h;
+}
+
+function vRdo(){
+  const r=S.rdos.find(x=>x.id===S.view.id);const o=S.obra||{};
+  if(!r)return `<div class="empty">Relatório não encontrado.</div>`;
+  const d=dia(r.data);const cl=r.clima||{};const ef=r.efetivo||[];const tot=ef.reduce((s,e)=>s+(+e.qtd||0),0);
+  return `<article class="rep">
+    <div class="rep-h"><div><div class="lbl">Relatório diário de obra</div><div class="v">${esc(o.nome||'')}</div><div class="lbl" style="text-transform:none;letter-spacing:0">${esc(o.endereco||'')}${o.cliente?' · Cliente: '+esc(o.cliente):''}</div></div>
+    <div style="text-align:right"><div class="lbl">${DS[d.getDay()]}</div><div class="v mono">${fmt(r.data)}</div>${o.inicio?`<div class="lbl">Dia ${diff(o.inicio,r.data)+1} de obra</div>`:''}</div></div>
+    <div class="rep-b">
+      <section class="rep-s"><h3>Clima e condição</h3><div class="tbl-w"><table><thead><tr><th>Período</th><th>Tempo</th><th>Condição</th></tr></thead><tbody>
+      ${[['manha','Manhã'],['tarde','Tarde'],['noite','Noite']].map(([k,l])=>`<tr><td>${l}</td><td>${esc(cl[k]?.tempo||'—')}</td><td>${cl[k]?.tempo==='Sem expediente'?'—':esc(cl[k]?.cond||'—')}</td></tr>`).join('')}
+      </tbody></table></div></section>
+      <section class="rep-s"><h3>Efetivo</h3>${ef.length?`<div class="tbl-w"><table><thead><tr><th>Função</th><th style="text-align:right">Qtd.</th></tr></thead><tbody>${ef.map(e=>`<tr><td>${esc(e.funcao)}</td><td class="n">${esc(e.qtd)}</td></tr>`).join('')}<tr><td><b>Total</b></td><td class="n"><b>${tot}</b></td></tr></tbody></table></div>`:'<div class="muted">Não informado.</div>'}</section>
+      <section class="rep-s"><h3>Serviços executados</h3><div class="txt">${esc(r.servicos||'—')}</div></section>
+      <section class="rep-s"><h3>Ocorrências</h3><div class="txt">${esc(r.ocorrencias||'Nenhuma.')}</div></section>
+      ${r.observacoes?`<section class="rep-s"><h3>Observações</h3><div class="txt">${esc(r.observacoes)}</div></section>`:''}
+      <section class="rep-s"><h3>Registro fotográfico</h3>${(r.fotos||[]).length?`<div class="rep-fotos">${r.fotos.map((f,i)=>`<figure><img data-img="${esc(f.id)}" alt="${esc(f.legenda||'Foto '+(i+1))}"><figcaption><b>FOTO ${pad(i+1)}</b>${esc(f.legenda||'Sem legenda')}</figcaption></figure>`).join('')}</div>`:'<div class="muted">Sem fotos.</div>'}</section>
+      <section class="rep-s"><div class="muted" style="font-size:13px">Responsável: ${esc(r.responsavel||o.responsavel||'—')}${r.atualizadoEm?` · atualizado em ${new Date(r.atualizadoEm).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}`:''}</div></section>
+    </div></article>
+    <div class="row noprint"><button class="btn primary" data-act="rdoEditar" data-id="${esc(r.data)}">Editar RDO</button><button class="btn" data-act="rdoShare" data-id="${esc(r.id)}">Enviar resumo</button><button class="btn" data-act="imprimir">Imprimir / PDF</button><button class="btn danger" data-act="rdoExcluir" data-id="${esc(r.id)}">Excluir</button></div>`;
+}
+
+function vRdoEdit(){
+  const r=S.draft;const cl=r.clima;
+  const per=[['manha','Manhã'],['tarde','Tarde'],['noite','Noite']];
+  return `<div class="form">
+  <div class="card sec"><label class="f">Data do relatório<input type="date" id="r_data" value="${esc(r.data)}" ${S.view.existe?'disabled':''}></label>
+  ${S.view.existe?'':'<div class="muted" style="font-size:13px">Se já existir RDO nesta data, ele será carregado para continuar.</div>'}
+  <label class="f">Responsável pelo preenchimento<input data-f="responsavel" value="${esc(r.responsavel)}"></label></div>
+  <div class="card sec"><h3>Clima e condição</h3>
+    ${per.map(([k,l])=>`<div class="clima"><span class="p">${l}</span><div class="seg">${TEMPO.map(t=>`<button type="button" aria-pressed="${cl[k].tempo===t}" data-act="clima" data-p="${k}" data-k="tempo" data-v="${t}">${t}</button>`).join('')}</div>
+    <span></span><div class="seg">${COND.map(c=>`<button type="button" aria-pressed="${cl[k].cond===c}" data-act="clima" data-p="${k}" data-k="cond" data-v="${c}">${c}</button>`).join('')}</div></div>`).join('<hr style="border:0;border-top:1px solid var(--line);margin:4px 0;width:100%">')}
+  </div>
+  <div class="card sec"><div class="row spread"><h3>Efetivo</h3><span class="mono muted">${r.efetivo.reduce((s,e)=>s+(+e.qtd||0),0)} pessoas</span></div>
+    ${r.efetivo.map((e,i)=>`<div class="efrow"><input class="inp" aria-label="Função" data-ef="${i}" data-k="funcao" value="${esc(e.funcao)}" placeholder="Função"><input class="inp mono" aria-label="Quantidade" type="number" min="0" inputmode="numeric" data-ef="${i}" data-k="qtd" value="${esc(e.qtd)}"><button type="button" class="x" data-act="efRm" data-i="${i}" aria-label="Remover">×</button></div>`).join('')}
+    <div class="chips">${FUNCOES.filter(f=>!r.efetivo.some(e=>e.funcao===f)).map(f=>`<button type="button" class="chip" data-act="efAdd" data-v="${f}">+ ${f}</button>`).join('')}<button type="button" class="chip" data-act="efAdd" data-v="">+ Outra</button></div>
+  </div>
+  <div class="card sec"><h3>Serviços executados</h3><textarea data-f="servicos" aria-label="Serviços executados" placeholder="Um serviço por linha. Ex.: Concretagem da laje do 2º pavimento">${esc(r.servicos)}</textarea></div>
+  <div class="card sec"><h3>Ocorrências</h3><textarea data-f="ocorrencias" aria-label="Ocorrências" placeholder="Atrasos de entrega, acidentes, visitas, paralisações…">${esc(r.ocorrencias)}</textarea></div>
+  <div class="card sec"><h3>Observações</h3><textarea data-f="observacoes" aria-label="Observações" style="min-height:64px">${esc(r.observacoes)}</textarea></div>
+  <div class="card sec"><h3>Fotos</h3>
+    ${r.fotos.length?`<div class="fotos">${r.fotos.map((f,i)=>`<div class="foto"><img data-img="${esc(f.id)}" alt="Foto ${i+1}"><label class="leg" for="leg_${i}">Foto ${pad(i+1)} · o que mostra esta foto?</label><textarea id="leg_${i}" data-foto="${i}" placeholder="Ex.: Concretagem da laje do 2º pavimento, vista do eixo C — armadura conferida antes do lançamento">${esc(f.legenda)}</textarea><span class="legaviso" ${f.legenda?'hidden':''}>Sem descrição</span><button type="button" class="rm" data-act="fotoRm" data-i="${i}">Remover foto</button></div>`).join('')}</div>`:''}
+    <label class="upl"><input type="file" id="r_fotos" accept="image/*" multiple>${S.busy?'Salvando fotos…':'📷 Tirar foto ou escolher da galeria'}</label>
+  </div>
+  <div class="row"><button class="btn primary" style="flex:1" data-act="rdoSalvar" ${S.busy?'disabled':''}>Salvar RDO</button><button class="btn" data-act="rdoCancelar">Cancelar</button></div>
+  </div>`;
+}
+
+function tLocacoes(){
+  const L=[...S.locs].sort((a,b)=>(!!a.devolvido-!!b.devolvido)||(a.vencimento||'9').localeCompare(b.vencimento||'9'));
+  let h=`<div class="row spread"><h2>Equipamentos locados</h2><button class="btn primary small" data-act="locNova">+ Locação</button></div>`;
+  if(S.loc)h+=fLoc();
+  if(!L.length&&!S.loc)h+=`<div class="empty">Cadastre betoneiras, andaimes, escoras, caçambas… e acompanhe o vencimento de cada locação.</div>`;
+  h+=`<div class="list">`+L.map(l=>{const s=locStatus(l);return `<div class="item" style="cursor:default"><span class="stripe ${s.k}"></span><span class="grow">
+    <span class="row spread"><span class="t">${esc(l.equipamento)}${l.qtd>1?` <span class="mono muted">×${esc(l.qtd)}</span>`:''}</span><span class="pill ${s.k}">${s.txt}</span></span>
+    <span class="s" style="display:block">${esc(l.fornecedor||'Fornecedor não informado')} · <span class="mono">${fmt(l.inicio)} → ${fmt(l.vencimento)}</span></span>
+    ${l.obs?`<span class="s" style="display:block">${esc(l.obs)}</span>`:''}
+    <span class="row" style="margin-top:8px;gap:6px"><button class="btn small" data-act="locEditar" data-id="${esc(l.id)}">Editar / renovar</button>${l.devolvido?'':`<button class="btn small" data-act="locDevolver" data-id="${esc(l.id)}">Marcar devolvido</button>`}<button class="btn small danger" data-act="locExcluir" data-id="${esc(l.id)}">Excluir</button></span>
+  </span></div>`}).join('')+`</div>`;
+  return h;
+}
+function fLoc(){
+  const l=S.loc;
+  return `<form class="card form" id="fLoc"><h3>${l.id?'Editar locação':'Nova locação'}</h3>
+    <label class="f">Equipamento<input id="l_eq" required value="${esc(l.equipamento)}" placeholder="Ex.: Betoneira 400L"></label>
+    <div class="grid2"><label class="f">Fornecedor<input id="l_forn" value="${esc(l.fornecedor)}"></label><label class="f">Quantidade<input id="l_qtd" type="number" min="1" inputmode="numeric" value="${esc(l.qtd||1)}"></label></div>
+    <div class="grid2"><label class="f">Início<input type="date" id="l_ini" value="${esc(l.inicio||hoje())}"></label><label class="f">Vencimento<input type="date" id="l_venc" required value="${esc(l.vencimento)}"></label></div>
+    <label class="f">Observações<input id="l_obs" value="${esc(l.obs)}" placeholder="Nº do contrato, valor, contato…"></label>
+    ${l.id?`<label class="row" style="gap:8px;font-size:15px"><input type="checkbox" id="l_dev" ${l.devolvido?'checked':''}> Equipamento devolvido</label>`:''}
+    <div class="row"><button class="btn primary" type="submit" style="flex:1">Salvar</button><button class="btn" type="button" data-act="locCancelar">Cancelar</button></div></form>`;
+}
+
+function tProjetos(){
+  const grupos={};S.projs.forEach(p=>{(grupos[p.disciplina||'Outros']=grupos[p.disciplina||'Outros']||[]).push(p)});
+  let h=`<div class="row spread"><h2>Projetos</h2><button class="btn primary small" data-act="projNovo">+ Arquivo</button></div>`;
+  if(S.proj)h+=`<form class="card form" id="fProj"><h3>Novo arquivo de projeto</h3>
+    <label class="f">Nome<input id="p_nome" required placeholder="Ex.: Planta baixa térreo"></label>
+    <div class="grid2"><label class="f">Disciplina<select id="p_disc">${DISC.map(d=>`<option>${d}</option>`).join('')}</select></label><label class="f">Revisão<input id="p_rev" placeholder="R00"></label></div>
+    <label class="f">Arquivo (PDF ou imagem)<input type="file" id="p_arq" required accept="application/pdf,image/*"></label>
+    <div class="row"><button class="btn primary" type="submit" style="flex:1" ${S.busy?'disabled':''}>${S.busy?'Salvando…':'Salvar'}</button><button class="btn" type="button" data-act="projCancelar">Cancelar</button></div></form>`;
+  if(!S.projs.length&&!S.proj)h+=`<div class="empty">Guarde aqui plantas, cortes e memoriais em PDF ou imagem para consultar no canteiro.</div>`;
+  Object.keys(grupos).sort((a,b)=>DISC.indexOf(a)-DISC.indexOf(b)).forEach(g=>{
+    h+=`<h3>${esc(g)}</h3><div class="list">`+grupos[g].sort((a,b)=>(a.nome||'').localeCompare(b.nome||'')).map(p=>`<div class="item" style="cursor:default;align-items:center"><span class="pill mono">${p.tipo==='application/pdf'?'PDF':'IMG'}</span><span class="grow"><span class="t" style="font-size:16px">${esc(p.nome)}</span> ${p.revisao?`<span class="pill mono">${esc(p.revisao)}</span>`:''}<span class="s" style="display:block">${esc(p.arquivo||'')} · ${fmt(p.data)}</span></span>
+      <button class="btn small" data-act="projAbrir" data-id="${esc(p.id)}">Abrir</button><button class="btn small danger" data-act="projExcluir" data-id="${esc(p.id)}" aria-label="Excluir">×</button></div>`).join('')+`</div>`;
+  });
+  return h;
+}
+
+function tDados(o){
+  const st=STATUS[o.status]||STATUS.andamento;
+  return `<div class="card"><dl class="kv">
+    <dt>Obra</dt><dd>${esc(o.nome)}</dd><dt>Cliente</dt><dd>${esc(o.cliente||'—')}</dd><dt>Endereço</dt><dd>${esc(o.endereco||'—')}</dd>
+    <dt>Responsável</dt><dd>${esc(o.responsavel||'—')}</dd><dt>Início</dt><dd class="mono">${fmt(o.inicio)}</dd><dt>Previsão</dt><dd class="mono">${fmt(o.previsao)}</dd>
+    <dt>Situação</dt><dd><span class="pill ${st[1]}">${st[0]}</span></dd><dt>RDOs</dt><dd class="mono">${S.rdos.length}</dd></dl></div>
+    <div class="row"><button class="btn" data-act="obraEditar">Editar dados</button><button class="btn danger" data-act="obraExcluir">Excluir obra</button></div>`;
+}
+
+function vBackup(){
+  const ult=LS.get('ultimoBackup');
+  return `<div class="card sec"><h2>Onde ficam os dados</h2>
+    <p style="margin:0">Tudo fica guardado <b>neste aparelho</b>, dentro do navegador. Se você limpar os dados do navegador, trocar de celular ou desinstalar o app, o histórico some. Por isso, faça backup com frequência e guarde o arquivo no Google Drive, WhatsApp ou e-mail.</p>
+    <div class="muted" style="font-size:14px">Último backup neste aparelho: <b>${ult?new Date(ult).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}):'nunca'}</b> · <span id="uso">calculando espaço…</span></div></div>
+  <div class="card sec"><h2>Fazer backup</h2>
+    <p style="margin:0" class="muted">Gera um arquivo <span class="mono">.json</span> com obras, RDOs, locações e projetos.</p>
+    <div class="row"><button class="btn primary" data-act="exportar" data-fotos="1" ${S.busy?'disabled':''}>Backup completo (com fotos)</button><button class="btn" data-act="exportar" data-fotos="0" ${S.busy?'disabled':''}>Só dados (sem fotos)</button></div></div>
+  <div class="card sec"><h2>Restaurar ou juntar</h2>
+    <p style="margin:0" class="muted">Abra um arquivo de backup para restaurar neste aparelho ou para juntar os RDOs que alguém da equipe preencheu em outro celular. Registros iguais (mesma obra e mesma data) são substituídos pelos do arquivo.</p>
+    <label class="upl"><input type="file" id="importar" accept="application/json,.json">${S.busy?'Importando…':'Escolher arquivo de backup'}</label></div>`;
+}
+
+function render(){
+  renderTop();
+  const a=$('#app');const v=S.view.name;
+  if(S.erro){a.innerHTML=`<div class="alert crit">${esc(S.erro)}</div>`;return}
+  if(!S.ready){a.innerHTML='<div class="empty">Carregando obras…</div>';return}
+  derivar();
+  a.innerHTML=v==='home'?vHome():v==='obraForm'?vObraForm():v==='obra'?vObra():v==='rdo'?vRdo():v==='rdoEdit'?vRdoEdit():v==='backup'?vBackup():'';
+  hidratar();
+  if(v==='backup')mostrarUso();
+}
+async function mostrarUso(){try{const e=await navigator.storage.estimate();const el=$('#uso');if(el)el.textContent=`${(e.usage/1048576).toFixed(1)} MB usados`}catch(e){const el=$('#uso');if(el)el.textContent=''}}
+
+/* ---------- RDO ---------- */
+function novoDraft(data){
+  const base=S.rdos.find(r=>r.data===data);
+  const vazio={manha:{tempo:'Bom',cond:'Praticável'},tarde:{tempo:'Bom',cond:'Praticável'},noite:{tempo:'Sem expediente',cond:''}};
+  if(base)return JSON.parse(JSON.stringify({clima:vazio,efetivo:[],fotos:[],...base}));
+  const ant=S.rdos[0];
+  return {data,clima:vazio,efetivo:ant?JSON.parse(JSON.stringify(ant.efetivo||[])):[],servicos:'',ocorrencias:'',observacoes:'',fotos:[],responsavel:ant?.responsavel||S.obra?.responsavel||''};
+}
+function abrirEditor(data){
+  derivar();
+  S.draft=novoDraft(data);S.novasFotos=[];S.removerFotos=[];
+  S.view={name:'rdoEdit',existe:!!S.rdos.find(r=>r.data===data)};render();window.scrollTo(0,0);
+}
+async function salvarRdo(){
+  const r=S.draft;if(!r.data){toast('Informe a data');return}
+  S.busy=true;render();
+  try{
+    const rec={id:S.obra.id+'_'+r.data,obraId:S.obra.id,data:r.data,clima:r.clima,efetivo:r.efetivo.filter(e=>e.funcao||+e.qtd).map(e=>({funcao:e.funcao||'Outros',qtd:+e.qtd||0})),servicos:r.servicos||'',ocorrencias:r.ocorrencias||'',observacoes:r.observacoes||'',fotos:r.fotos,responsavel:r.responsavel||'',atualizadoEm:new Date().toISOString()};
+    await DB.put('rdos',rec);troca(S.allRdos,rec);
+    if(r.data>(S.obra.ultimoRdo||'')){const o={...S.obra,ultimoRdo:r.data};await DB.put('obras',o);troca(S.obras,o)}
+    for(const id of S.removerFotos)await apagarArquivo(id);
+    persistir();
+    const semLeg=rec.fotos.filter(f=>!(f.legenda||'').trim()).length;
+    S.busy=false;S.draft=null;S.view={name:'rdo',id:rec.id};toast(semLeg?`RDO salvo — ${semLeg} foto(s) sem descrição`:'RDO salvo');render();window.scrollTo(0,0);
+  }catch(e){S.busy=false;render();toast('Não foi possível salvar: '+(e&&e.name==='QuotaExceededError'?'memória do aparelho cheia':(e&&e.message)||'erro'))}
+}
+async function cancelarRdo(){
+  for(const id of S.novasFotos||[])await apagarArquivo(id);
+  S.draft=null;S.view={name:'obra',id:S.obra.id,tab:'diario'};render();
+}
+async function comprimir(file){
+  if(!file.type.startsWith('image/')||file.type==='image/svg+xml')return file;
+  try{
+    const bmp=await createImageBitmap(file);const k=Math.min(1,1600/Math.max(bmp.width,bmp.height));
+    const c=document.createElement('canvas');c.width=Math.round(bmp.width*k);c.height=Math.round(bmp.height*k);
+    c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+    return await new Promise(res=>c.toBlob(b=>res(b||file),'image/jpeg',.82));
+  }catch(e){return file}
+}
+async function guardarArquivo(blob,nome){
+  const id=uid();await DB.put('arquivos',{id,blob,tipo:blob.type||'application/octet-stream',nome:nome||''});return id;
+}
+async function adicionarFotos(files){
+  if(!files.length)return;
+  S.busy=true;render();let falhas=0;
+  for(const f of files){
+    try{const b=await comprimir(f);const id=await guardarArquivo(b,f.name);S.draft.fotos.push({id,legenda:''});S.novasFotos.push(id)}
+    catch(e){falhas++}
+  }
+  S.busy=false;const primeira=S.draft.fotos.length-(files.length-falhas);render();const el=document.getElementById('leg_'+primeira);if(el){el.scrollIntoView({block:'center'});el.focus()}if(falhas)toast(`${falhas} foto(s) não salva(s). Tente novamente.`);else toast('Descreva o que cada foto mostra');
+}
+function textoRdo(r){
+  const o=S.obra||{};const cl=r.clima||{};const ef=r.efetivo||[];const tot=ef.reduce((s,e)=>s+(+e.qtd||0),0);
+  const p=(k,l)=>`${l}: ${cl[k]?.tempo||'—'}${cl[k]?.cond?' / '+cl[k].cond:''}`;
+  let t=`*RDO – ${o.nome||''}*\n${DS[dia(r.data).getDay()]}, ${fmt(r.data)}${o.inicio?` · Dia ${diff(o.inicio,r.data)+1} de obra`:''}\n\n`;
+  t+=`*Clima*\n${p('manha','Manhã')}\n${p('tarde','Tarde')}\n${p('noite','Noite')}\n\n`;
+  t+=`*Efetivo (${tot})*\n${ef.map(e=>`${e.qtd} ${e.funcao}`).join('\n')||'Não informado'}\n\n`;
+  t+=`*Serviços executados*\n${r.servicos||'—'}\n\n*Ocorrências*\n${r.ocorrencias||'Nenhuma.'}`;
+  if(r.observacoes)t+=`\n\n*Observações*\n${r.observacoes}`;
+  if((r.fotos||[]).length)t+=`\n\n*Fotos*\n${r.fotos.map((f,i)=>`${i+1}. ${f.legenda||'Sem legenda'}`).join('\n')}`;
+  return t;
+}
+async function compartilharRdo(r){
+  const text=textoRdo(r);
+  try{
+    const files=[];
+    if(navigator.canShare){for(const [i,f] of (r.fotos||[]).entries()){const a=await DB.get('arquivos',f.id);if(a)files.push(new File([a.blob],`foto-${pad(i+1)}.jpg`,{type:a.tipo||'image/jpeg'}))}}
+    if(files.length&&navigator.canShare({files,text})){await navigator.share({files,text,title:'RDO '+fmt(r.data)});return}
+    if(navigator.share){await navigator.share({text,title:'RDO '+fmt(r.data)});return}
+  }catch(e){if(e&&e.name==='AbortError')return}
+  try{await navigator.clipboard.writeText(text);toast('Resumo copiado. Cole no WhatsApp ou e-mail.')}catch(e){toast('Não foi possível compartilhar neste navegador')}
+}
+
+/* ---------- backup ---------- */
+function blobParaDataUrl(b){return new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=()=>rej(fr.error);fr.readAsDataURL(b)})}
+function baixar(blob,nome){const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download=nome;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}
+async function exportar(comFotos){
+  S.busy=true;render();
+  try{
+    const out={app:'diario-obra',versao:1,exportadoEm:new Date().toISOString(),comFotos,obras:S.obras,rdos:S.allRdos,locacoes:S.allLocs,projetos:S.allProjs,arquivos:[]};
+    if(comFotos){const arqs=await DB.all('arquivos');for(const a of arqs)out.arquivos.push({id:a.id,tipo:a.tipo,nome:a.nome,dados:await blobParaDataUrl(a.blob)})}
+    const nome=`diario-obra-backup-${hoje()}${comFotos?'':'-sem-fotos'}.json`;
+    const blob=new Blob([JSON.stringify(out)],{type:'application/json'});
+    let feito=false;
+    try{const f=new File([blob],nome,{type:'application/json'});if(navigator.canShare&&navigator.canShare({files:[f]})&&/Android|iPhone|iPad/i.test(navigator.userAgent)){await navigator.share({files:[f],title:'Backup Diário de Obra'});feito=true}}catch(e){if(e&&e.name==='AbortError'){S.busy=false;render();return}}
+    if(!feito)baixar(blob,nome);
+    LS.set('ultimoBackup',new Date().toISOString());toast('Backup gerado');
+  }catch(e){toast('Não foi possível gerar o backup')}
+  S.busy=false;render();
+}
+async function importar(file){
+  S.busy=true;render();
+  try{
+    const d=JSON.parse(await file.text());
+    if(d.app!=='diario-obra')throw new Error('Este arquivo não é um backup do Diário de Obra.');
+    let n=0;
+    for(const a of d.arquivos||[]){const b=await (await fetch(a.dados)).blob();await DB.put('arquivos',{id:a.id,blob:b,tipo:a.tipo,nome:a.nome});soltarUrl(a.id)}
+    for(const o of d.obras||[]){const atual=S.obras.find(x=>x.id===o.id);const rec={...o,ultimoRdo:[(atual&&atual.ultimoRdo)||'',o.ultimoRdo||''].sort().pop()};await DB.put('obras',rec);troca(S.obras,rec);n++}
+    for(const r of d.rdos||[]){await DB.put('rdos',r);troca(S.allRdos,r)}
+    for(const l of d.locacoes||[]){await DB.put('locacoes',l);troca(S.allLocs,l)}
+    for(const p of d.projetos||[]){await DB.put('projetos',p);troca(S.allProjs,p)}
+    persistir();
+    toast(`Importado: ${n} obra(s), ${(d.rdos||[]).length} RDO(s)`);
+  }catch(e){toast(e.message&&e.message.startsWith('Este')?e.message:'Arquivo inválido ou corrompido')}
+  S.busy=false;render();
+}
+
+/* ---------- eventos ---------- */
+document.addEventListener('click',async ev=>{
+  const b=ev.target.closest('[data-act]');if(!b)return;
+  const act=b.dataset.act,id=b.dataset.id;
+  switch(act){
+    case 'cf-no':S.confirm=null;renderModal();break;
+    case 'cf-yes':{const fn=S.confirm.fn;S.confirm=null;renderModal();await fn();break}
+    case 'back':{
+      const to=b.dataset.to;
+      if(S.view.name==='rdoEdit'){await cancelarRdo();break}
+      if(to==='home'){S.view={name:'home'};S.obra=null;LS.set('ultimaObra','')}
+      else S.view={name:'obra',id:S.obra.id,tab:S.view.name==='obraForm'?'dados':'diario'};
+      render();window.scrollTo(0,0);break}
+    case 'backup':S.view={name:'backup'};render();break;
+    case 'exportar':exportar(b.dataset.fotos==='1');break;
+    case 'novaObra':S.view={name:'obraForm'};render();break;
+    case 'abrir':abrirObra(id);window.scrollTo(0,0);break;
+    case 'tab':S.view.tab=b.dataset.tab;S.loc=null;S.proj=null;render();break;
+    case 'rdoNovo':abrirEditor(hoje());break;
+    case 'rdoVer':S.view={name:'rdo',id};render();window.scrollTo(0,0);break;
+    case 'rdoEditar':abrirEditor(id);break;
+    case 'rdoShare':{const r=S.allRdos.find(x=>x.id===id);if(r)compartilharRdo(r);break}
+    case 'imprimir':window.print();break;
+    case 'rdoExcluir':{const r=S.allRdos.find(x=>x.id===id);confirmar(`Excluir o RDO de ${fmt(r?.data)}? As fotos dele também serão apagadas.`,'Excluir',async()=>{
+      try{await DB.del('rdos',id);tira(S.allRdos,id);for(const f of r?.fotos||[])await apagarArquivo(f.id);
+      S.view={name:'obra',id:S.obra.id,tab:'diario'};render();toast('RDO excluído')}catch(e){toast('Não foi possível excluir')}});break}
+    case 'clima':{const c=S.draft.clima[b.dataset.p];c[b.dataset.k]=b.dataset.v;if(b.dataset.v==='Sem expediente')c.cond='';else if(b.dataset.k==='tempo'&&!c.cond)c.cond='Praticável';if(b.dataset.k==='cond'&&c.tempo==='Sem expediente')c.tempo='Bom';render();break}
+    case 'efAdd':S.draft.efetivo.push({funcao:b.dataset.v,qtd:1});render();break;
+    case 'efRm':S.draft.efetivo.splice(+b.dataset.i,1);render();break;
+    case 'fotoRm':{const f=S.draft.fotos.splice(+b.dataset.i,1)[0];if(f){if(S.novasFotos.includes(f.id))await apagarArquivo(f.id);else S.removerFotos.push(f.id)}render();break}
+    case 'rdoSalvar':salvarRdo();break;
+    case 'rdoCancelar':cancelarRdo();break;
+    case 'locNova':S.loc={};render();break;
+    case 'locEditar':S.loc={...S.locs.find(l=>l.id===id)};render();window.scrollTo(0,0);break;
+    case 'locCancelar':S.loc=null;render();break;
+    case 'locDevolver':{const l={...S.allLocs.find(x=>x.id===id),devolvido:true,devolvidoEm:hoje()};try{await DB.put('locacoes',l);troca(S.allLocs,l);render();toast('Marcado como devolvido')}catch(e){toast('Não foi possível atualizar')}break}
+    case 'locExcluir':confirmar('Excluir esta locação?','Excluir',async()=>{try{await DB.del('locacoes',id);tira(S.allLocs,id);render();toast('Locação excluída')}catch(e){toast('Não foi possível excluir')}});break;
+    case 'projNovo':S.proj={};render();break;
+    case 'projCancelar':S.proj=null;render();break;
+    case 'projAbrir':{const p=S.allProjs.find(x=>x.id===id);const u=p&&await urlDe(p.arquivoId);if(!u){toast('Arquivo não encontrado neste aparelho');break}const a=document.createElement('a');a.href=u;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();break}
+    case 'projExcluir':confirmar('Excluir este arquivo de projeto?','Excluir',async()=>{const p=S.allProjs.find(x=>x.id===id);try{await DB.del('projetos',id);tira(S.allProjs,id);if(p?.arquivoId)await apagarArquivo(p.arquivoId);render();toast('Arquivo excluído')}catch(e){toast('Não foi possível excluir')}});break;
+    case 'obraEditar':S.view={name:'obraForm',id:S.obra.id};render();break;
+    case 'obraExcluir':confirmar(`Excluir a obra "${S.obra.nome}" com todo o histórico de RDOs, locações e projetos? Não dá para desfazer.`,'Excluir obra',excluirObra);break;
+  }
+});
+document.addEventListener('input',ev=>{
+  const t=ev.target;if(!S.draft)return;
+  if(t.dataset.f)S.draft[t.dataset.f]=t.value;
+  else if(t.dataset.ef!==undefined)S.draft.efetivo[+t.dataset.ef][t.dataset.k]=t.value;
+  else if(t.dataset.foto!==undefined){S.draft.fotos[+t.dataset.foto].legenda=t.value;const w=t.parentElement.querySelector('.legaviso');if(w)w.hidden=!!t.value.trim()}
+});
+document.addEventListener('change',ev=>{
+  const t=ev.target;
+  if(t.id==='r_data'&&S.draft){const d=t.value;if(!d)return;if(S.rdos.find(r=>r.data===d)){cancelarNovas();abrirEditor(d);toast('RDO desta data carregado')}else S.draft.data=d}
+  if(t.id==='r_fotos'){adicionarFotos([...t.files]);t.value=''}
+  if(t.id==='importar'&&t.files[0]){importar(t.files[0]);t.value=''}
+  if(t.dataset&&t.dataset.ef!==undefined&&t.dataset.k==='qtd')render();
+});
+async function cancelarNovas(){for(const id of S.novasFotos||[])await apagarArquivo(id)}
+document.addEventListener('submit',async ev=>{
+  ev.preventDefault();const f=ev.target;const v=id=>(f.querySelector('#'+id)?.value||'').trim();
+  if(f.id==='fObra'){
+    const data={nome:v('o_nome'),cliente:v('o_cliente'),endereco:v('o_end'),responsavel:v('o_resp'),inicio:v('o_ini'),previsao:v('o_fim'),status:v('o_status')};
+    if(!data.nome){toast('Informe o nome da obra');return}
+    try{
+      if(S.view.id){const o={...S.obras.find(x=>x.id===S.view.id),...data};await DB.put('obras',o);troca(S.obras,o);S.view={name:'obra',id:o.id,tab:'dados'};render();toast('Obra atualizada')}
+      else{const o={id:uid(),...data,criadoEm:new Date().toISOString(),ultimoRdo:''};await DB.put('obras',o);S.obras.push(o);persistir();abrirObra(o.id);toast('Obra criada')}
+    }catch(e){toast('Não foi possível salvar')}
+  }
+  if(f.id==='fLoc'){
+    const data={equipamento:v('l_eq'),fornecedor:v('l_forn'),qtd:+v('l_qtd')||1,inicio:v('l_ini'),vencimento:v('l_venc'),obs:v('l_obs'),devolvido:!!f.querySelector('#l_dev')?.checked};
+    if(!data.equipamento||!data.vencimento){toast('Informe equipamento e vencimento');return}
+    try{const rec={...(S.loc.id?S.allLocs.find(x=>x.id===S.loc.id):{}),...data,id:S.loc.id||uid(),obraId:S.obra.id};await DB.put('locacoes',rec);troca(S.allLocs,rec);S.loc=null;render();toast('Locação salva')}catch(e){toast('Não foi possível salvar')}
+  }
+  if(f.id==='fProj'){
+    const file=f.querySelector('#p_arq').files[0];if(!file){toast('Escolha um arquivo');return}
+    const nome=v('p_nome'),disc=v('p_disc'),rev=v('p_rev');
+    S.busy=true;render();
+    try{
+      const arquivoId=await guardarArquivo(file,file.name);
+      const rec={id:uid(),obraId:S.obra.id,nome:nome||file.name,disciplina:disc,revisao:rev,arquivoId,arquivo:file.name,tipo:file.type||'application/pdf',data:hoje()};
+      await DB.put('projetos',rec);S.allProjs.push(rec);persistir();
+      S.proj=null;toast('Arquivo salvo');
+    }catch(e){toast(e&&e.name==='QuotaExceededError'?'Memória do aparelho cheia':'Não foi possível salvar o arquivo')}
+    S.busy=false;render();
+  }
+});
+async function excluirObra(){
+  const id=S.obra.id;
+  try{
+    for(const r of S.allRdos.filter(x=>x.obraId===id)){for(const f of r.fotos||[])await apagarArquivo(f.id);await DB.del('rdos',r.id);tira(S.allRdos,r.id)}
+    for(const l of S.allLocs.filter(x=>x.obraId===id)){await DB.del('locacoes',l.id);tira(S.allLocs,l.id)}
+    for(const p of S.allProjs.filter(x=>x.obraId===id)){if(p.arquivoId)await apagarArquivo(p.arquivoId);await DB.del('projetos',p.id);tira(S.allProjs,p.id)}
+    await DB.del('obras',id);tira(S.obras,id);
+    S.obra=null;S.view={name:'home'};LS.set('ultimaObra','');render();toast('Obra excluída');
+  }catch(e){toast('Não foi possível excluir a obra')}
+}
+
+/* ---------- início ---------- */
+render();
+(async()=>{
+  try{
+    await DB.open();
+    [S.obras,S.allRdos,S.allLocs,S.allProjs]=await Promise.all(['obras','rdos','locacoes','projetos'].map(n=>DB.all(n)));
+    S.ready=true;
+    const u=LS.get('ultimaObra');
+    if(u&&S.obras.some(o=>o.id===u))abrirObra(u);else render();
+  }catch(e){
+    S.erro='Este navegador não permitiu guardar dados. Abra o app pelo Chrome (Android) ou Safari (iPhone), fora da navegação anônima.';render();
+  }
+})();
+if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+})();
+</script>
+</body>
+</html>

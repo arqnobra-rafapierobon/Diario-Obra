@@ -1,0 +1,16 @@
+{
+  "name": "Diário de Obra",
+  "short_name": "Diário Obra",
+  "description": "RDO com histórico diário, fotos, locações e projetos",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EEF0F2",
+  "theme_color": "#1C2A3B",
+  "lang": "pt-BR",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}
